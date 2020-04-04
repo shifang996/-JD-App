@@ -70,7 +70,16 @@ import {
   Overlay,
   List,
   Cell,
-  CellGroup
+  CellGroup,
+  Card,
+  Stepper,
+  Checkbox,
+  CheckboxGroup,
+  SubmitBar,
+  Tab,
+  Tabs,
+  DropdownMenu,
+  DropdownItem
 } from 'vant';
 //使用框架局部组件
 Vue.use(Tabbar)
@@ -100,12 +109,21 @@ Vue.use(Tabbar)
   .use(Overlay)
   .use(List)
   .use(Cell)
-  .use(CellGroup);
+  .use(CellGroup)
+  .use(Card)
+  .use(Stepper)
+  .use(Checkbox)
+  .use(CheckboxGroup)
+  .use(Tab)
+  .use(Tabs)
+  .use(DropdownItem)
+  .use(DropdownMenu)
+  .use(SubmitBar);
 
 Vue.config.productionTip = false;
 //路由拦截导航狗子
 router.beforeEach((to, from, next) => {
-  if (to.name == 'login' || to.name == 'register' || to.name == 'detail' || to.name == 'search') {
+  if (to.name == 'login' || to.name == 'register' || to.name == 'detail' || to.name == 'search' || to.name == 'searchinfo') {
     //底部导航栏显示隐藏函数vuex
     store.commit('Handle_Bottom', false);
   } else {

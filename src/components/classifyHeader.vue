@@ -21,7 +21,8 @@ export default {
   },
   methods: {
     JumpWeb() {
-      this.$router.push({ name: 'home' });
+      //返回上级菜单
+      history.go(-1)
     },
     //获取焦点事件触发跳转
     turnSearch() {

@@ -87,6 +87,8 @@ export default {
       this.searchDataList = res.data;
     },
     onCancel() {
+      //跳转到详情搜索页
+      this.$router.push({name:"searchinfo"})
       //点击取消使得遮罩层隐藏
       this.searchInputFlag = false;
     },

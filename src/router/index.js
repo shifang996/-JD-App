@@ -14,6 +14,8 @@ import Register from '../views/Register.vue';
 import DetailShopping from '../views/Detail_Shopping.vue';
 //引入搜索页
 import Search from '../views/SearchGood.vue';
+//引入特有的搜索页
+import SearchInfo from '../views/SearchInfo.vue';
 
 Vue.use(VueRouter);
 
@@ -95,6 +97,14 @@ const routes = [
     path: '/search',
     name: 'search',
     component: Search,
+    meta: {
+      isGuest: true
+    }
+  },
+  {
+    path: '/searchinfo',
+    name: 'searchinfo',
+    component: SearchInfo,
     meta: {
       isGuest: true
     }

@@ -1,7 +1,19 @@
 <template>
   <div>
     <!-- 头部标签 -->
-    <van-nav-bar title="商品详情" left-arrow @click-left="onClickLeft" />
+    <van-nav-bar left-arrow @click-left="onClickLeft">
+      <template #title>
+        <van-row>
+          <van-col span="6">商品</van-col>
+          <van-col span="6">评价</van-col>
+          <van-col span="6">详情</van-col>
+          <van-col span="6">推荐</van-col>
+        </van-row>
+      </template>
+      <template #right>
+          <van-icon name="ellipsis" />
+      </template>
+    </van-nav-bar>
     <van-swipe class="my-swipe" indicator-color="#fc1800" style="height: 360px;">
       <van-swipe-item v-for="(item, index) in detailData.images" :key="index" @click="showBigImgs">
         <img :src="item" alt="" />
@@ -65,18 +77,7 @@ export default {
       sku: {
         // 所有sku规格类目与其值的从属关系，比如商品有颜色和尺码两大类规格，颜色下面又有红色和蓝色两个规格值。
         // 可以理解为一个商品可以有多个规格类目，一个规格类目下可以有多个规格值。
-        tree: [
-          {
-            k: '颜色', // skuKeyName：规格类目名称
-            v: [
-              {
-                id: '30349', // skuValueId：规格值 id
-                name: '红色' // skuValueName：规格值名称
-              }
-            ],
-            k_s: 's1' // skuKeyStr：sku 组合列表（下方 list）中当前类目对应的 key 值，value 值会是从属于当前类目的一个规格值 id
-          }
-        ],
+        tree: [],
         // 所有 sku 的组合列表，比如红色、M 码为一个 sku 组合，红色、S 码为另一个组合
         list: [
           {
@@ -94,8 +95,7 @@ export default {
         none_sku: false // 是否无规格商品
       },
       goods: {
-        // 默认商品 sku 缩略图
-        picture: 'https://img.yzcdn.cn/1.jpg'
+        picture: ''
       }
     };
   },
@@ -125,22 +125,31 @@ export default {
       console.log(idds);
       const { data: res } = await this.$axios.get(`/goods/info?gid=${idds}&type=details&token=1ec949a15fb709370f`);
       console.log('产品详情', res.data);
+      this.goods.picture = res.data.images;
     },
     //获取商品规格
     async getFull_shopRuler(idds) {
       const { data: res } = await this.$axios.get(`/goods/info?gid=${idds}&type=spec&token=1ec949a15fb709370f`);
       console.log('商品规格', res.data);
-      const result = res.data;
-      this.sku.tree[0].v.name = result[0].title;
-      this.sku.tree[0].v.name = result[0].attrid;
       //异步调用资源数据
-      this.handle_Data(result);
+      this.handle_Data(res.data);
     },
     //处理异步数据资源
     handle_Data(resources) {
-      console.log('******', resources);
-      const listObj = resources;
-      console.log(listObj);
+      var handles = [];
+      resources.forEach(item => {
+        let keys = item.title.split(','); //获取键名规格值
+        let valuesinfo = item.values.map(val => {
+          return { id: val.vid, name: val.value };
+        });
+        handles.push({
+          k: keys,
+          v: valuesinfo,
+          ks: item.attrid
+        });
+      });
+      console.log(handles);
+      this.sku.tree = handles;
     },
     //获取商品评价
     async getProduct_Review(idds) {
