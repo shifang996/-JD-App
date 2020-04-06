@@ -10,7 +10,7 @@
         </form>
       </van-col>
       <van-col span="4">
-        <van-button round type="danger" size="small" @click="onSearch">搜索</van-button>
+        <van-button round type="danger" size="small" @click="searchBtnFunction">搜索</van-button>
       </van-col>
     </van-row>
     <van-divider />
@@ -37,7 +37,7 @@
           <van-cell-group>
             <van-cell v-for="(item, index) in searchDataList" :key="index">
               <template #title>
-                <span :attrid="item.attrid" >{{ item.title }}</span>
+                <span :attrid="item.attrid">{{ item.title }}</span>
               </template>
               <template #default>
                 <van-row>
@@ -68,7 +68,7 @@ export default {
       //遮罩层显示区
       searchInputFlag: false,
       //搜索数据实时返回的列表数据
-      searchDataList: []
+      searchDataList: [],
     };
   },
   methods: {
@@ -88,7 +88,7 @@ export default {
     },
     onCancel() {
       //跳转到详情搜索页
-      this.$router.push({name:"searchinfo"})
+      this.$router.push({ name: 'searchinfo' });
       //点击取消使得遮罩层隐藏
       this.searchInputFlag = false;
     },
@@ -105,8 +105,12 @@ export default {
       this.searchInputFlag = true;
       // 双向数据绑定实时的输入数据返回的值
       this.onSearch();
-    }
-  }
+    },
+    //单击搜索数据
+    searchBtnFunction() {
+      this.$router.push({name:"searchinfo",query:{searchVal:this.value}})
+    },
+  },
 };
 </script>
 <style lang="less" scoped>

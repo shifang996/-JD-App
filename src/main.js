@@ -79,7 +79,10 @@ import {
   Tab,
   Tabs,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
+  Notify,
+  Image,
+  Pagination,
 } from 'vant';
 //使用框架局部组件
 Vue.use(Tabbar)
@@ -118,7 +121,10 @@ Vue.use(Tabbar)
   .use(Tabs)
   .use(DropdownItem)
   .use(DropdownMenu)
-  .use(SubmitBar);
+  .use(Image)
+  .use(Notify)
+  .use(SubmitBar)
+  .use(Pagination);
 
 Vue.config.productionTip = false;
 //路由拦截导航狗子
@@ -145,5 +151,5 @@ router.beforeEach((to, from, next) => {
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: (h) => h(App),
 }).$mount('#app');

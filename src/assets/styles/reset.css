@@ -3,6 +3,13 @@ html {
   background-color: #fff;
   color: #000;
   font-size: 40px;
+  /* 全局灰色css */
+  /* -webkit-filter: grayscale(100%);
+        -moz-filter: grayscale(100%);
+        -ms-filter: grayscale(100%);
+        -o-filter: grayscale(100%);
+        filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);
+        _filter:none; */
 }
 body,
 ul,
