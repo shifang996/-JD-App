@@ -83,9 +83,11 @@ import {
   Notify,
   Image,
   Pagination,
+  Dialog,CountDown
 } from 'vant';
 //使用框架局部组件
-Vue.use(Tabbar)
+Vue.prototype.$dialog = Dialog;
+Vue.use(Tabbar).use(CountDown)
   .use(TabbarItem)
   .use(Icon)
   .use(Search)

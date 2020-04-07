@@ -54,7 +54,7 @@ export default {
       if (this.loginMode) {
         // console.log('退出登录');
         //清空token值
-        sessionStorage.clear();
+        sessionStorage.token="";
         window.location.reload(); //刷新页面,不重复提交页面。
       } else {
         // console.log('登录跳转');

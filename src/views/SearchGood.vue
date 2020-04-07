@@ -14,6 +14,19 @@
       </van-col>
     </van-row>
     <van-divider />
+    <!-- 历史搜索记录 -->
+    <div class="historyText">
+      <van-row type="flex" justify="space-between">
+        <van-col :span="12" class="hisTag">最近搜索</van-col>
+        <van-col :span="12" style="padding-left: 128px;"><van-icon @click="deleteHistory" name="delete"/></van-col>
+      </van-row>
+      <!-- 搜索历史 -->
+      <van-row>
+        <van-col :span="8" v-for="(item, index) in searchHistory" :key="index">
+          <van-tag>{{ item }}</van-tag>
+        </van-col>
+      </van-row>
+    </div>
     <!-- 热搜关键词 -->
     <div class="hotTitle">
       <h1 class="hotLeft">热搜关键词</h1>
@@ -59,6 +72,7 @@ export default {
   created() {
     //获取热搜关键词语
     this.getHotWords();
+    this.historySearchFunction(); //调用存储历史历史记录
   },
   data() {
     return {
@@ -69,6 +83,7 @@ export default {
       searchInputFlag: false,
       //搜索数据实时返回的列表数据
       searchDataList: [],
+      searchHistory: [],
     };
   },
   methods: {
@@ -108,7 +123,30 @@ export default {
     },
     //单击搜索数据
     searchBtnFunction() {
-      this.$router.push({name:"searchinfo",query:{searchVal:this.value}})
+      if (!window.sessionStorage.searchValue) {
+        window.sessionStorage.searchValue = '[]';
+        const checksTest = JSON.parse(sessionStorage.searchValue).concat(this.value);
+        sessionStorage.searchValue = JSON.stringify(checksTest);
+      } else {
+        let searchText = JSON.parse(window.sessionStorage.searchValue);
+        searchText = searchText.concat(this.value);
+        window.sessionStorage.searchValue = JSON.stringify(searchText);
+      }
+      this.historySearchFunction(); //调用存储历史历史记录
+      this.$router.push({ name: 'searchinfo', query: { searchVal: this.value } });
+    },
+    historySearchFunction() {
+      //调用存储历史历史记录函数
+      this.searchHistory = [];
+      this.searchHistory = JSON.parse(window.sessionStorage.searchValue);
+      console.log(this.searchHistory);
+    }, //清空历史记录
+    deleteHistory() {
+      this.$dialog.confirm({ message: '确定要清空吗？' }).then(() => {
+        // on confirm
+        window.sessionStorage.searchValue = '[]';
+        this.historySearchFunction(); //调用存储历史历史记录
+      });
     },
   },
 };
@@ -168,6 +206,19 @@ export default {
   .van-overlay {
     margin-top: 44px;
     background-color: white;
+  }
+  .historyText {
+    width: 100%;
+    padding: 4px 13px;
+    margin-bottom: 13px;
+    .hisTag {
+      font-size: 15px;
+      line-height: 15px;
+      color: #232326;
+      float: left;
+      width: 100px;
+      padding-left: 1px;
+    }
   }
 }
 </style>

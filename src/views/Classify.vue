@@ -12,12 +12,17 @@
         <div v-for="(item, index) in rightContainer" :key="index">
           <div style="font-size: 16px;font-weight: bold;">{{ item.title }}</div>
           <!-- 九宫格导航 -->
-          <van-grid :column-num="3" class="icons">
-            <van-grid-item v-for="(ite, ind) in item.goods" :key="ind" :icon="ite.image" :text="ite.title" size="60px" @click="detailsFunction(ite.gid)" />
+          <van-grid :column-num="3" class="icons" icon-size="60px" border>
+            <van-grid-item v-for="(ite, ind) in item.goods" :key="ind" :icon="ite.image" @click="detailsFunction(ite.gid)">
+              <template #text>
+                <div class="van-multi-ellipsis--l2">{{ ite.title }}</div>
+              </template>
+            </van-grid-item>
           </van-grid>
         </div>
       </van-col>
     </van-row>
+    <div style="padding-top: 92px;"></div>
   </div>
 </template>
 
@@ -25,7 +30,7 @@
 //引入本页特有头部
 import classifyHeaderCom from '../components/classifyHeader';
 export default {
-  components: {  classifyHeaderCom },
+  components: { classifyHeaderCom },
   created() {
     //获取左边的文字
     this.getFullLeftTitle();
@@ -34,7 +39,7 @@ export default {
     return {
       activeKey: 0,
       leftText: [],
-      rightContainer: []
+      rightContainer: [],
     };
   },
   methods: {
@@ -55,8 +60,8 @@ export default {
     //跳转到详情页
     detailsFunction(idds) {
       this.$router.push({ name: 'detail', query: { gid: idds } });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less" scoped>
