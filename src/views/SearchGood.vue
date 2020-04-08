@@ -23,7 +23,7 @@
       <!-- 搜索历史 -->
       <van-row>
         <van-col :span="8" v-for="(item, index) in searchHistory" :key="index">
-          <van-tag>{{ item }}</van-tag>
+          <van-tag @click="searchTags(item)">{{ item }}</van-tag>
         </van-col>
       </van-row>
     </div>
@@ -35,7 +35,7 @@
     <van-row class="tagHot" v-if="isFlag ? true : false">
       <van-row>
         <van-col span="8" v-for="(item, index) in hotWord" :key="index">
-          <van-tag type="primary" plain v-if="item.title ? true : false">{{ item.title }}</van-tag>
+          <van-tag type="primary" plain v-if="item.title ? true : false" @click="hotSearchWords(item.cid, item.title)">{{ item.title }}</van-tag>
         </van-col>
       </van-row>
     </van-row>
@@ -89,7 +89,7 @@ export default {
   methods: {
     //获取热搜关键词
     async getHotWords() {
-      const { data: res } = await this.$axios.get('/public/hotwords?token=1ec949a15fb709370f');
+      const { data: res } = await this.$axios.get(`/category/menu?token=1ec949a15fb709370f`);
       console.log(res.data);
       //赋值
       this.hotWord = res.data;
@@ -123,17 +123,24 @@ export default {
     },
     //单击搜索数据
     searchBtnFunction() {
+      this.sessionStorageForHistory(this.value); //搜索历史记录函数显示数据处理
+      this.historySearchFunction(); //调用存储历史历史记录
+      this.$router.push({ name: 'searchinfo', query: { searchVal: this.value } });
+    },
+    //最近搜索历史记录函数显示数据处理***其中参数是拼接的问题********************************
+    sessionStorageForHistory(handle_values) {
+      //搜索历史记录函数显示数据处理
       if (!window.sessionStorage.searchValue) {
+        //如果不存在就创建空变量
         window.sessionStorage.searchValue = '[]';
-        const checksTest = JSON.parse(sessionStorage.searchValue).concat(this.value);
+        const checksTest = JSON.parse(sessionStorage.searchValue).concat(handle_values);//取出变量拼接
         sessionStorage.searchValue = JSON.stringify(checksTest);
       } else {
         let searchText = JSON.parse(window.sessionStorage.searchValue);
-        searchText = searchText.concat(this.value);
+        searchText = searchText.concat(handle_values);
         window.sessionStorage.searchValue = JSON.stringify(searchText);
       }
-      this.historySearchFunction(); //调用存储历史历史记录
-      this.$router.push({ name: 'searchinfo', query: { searchVal: this.value } });
+      this.$store.commit('handle_Search', handle_values); //存到中央状态仓库，用于下一页的显示,搜索框数据显示
     },
     historySearchFunction() {
       //调用存储历史历史记录函数
@@ -147,6 +154,16 @@ export default {
         window.sessionStorage.searchValue = '[]';
         this.historySearchFunction(); //调用存储历史历史记录
       });
+    },
+    //搜索字段Tag
+    searchTags(text) {
+      this.sessionStorageForHistory(text); //搜索历史记录函数显示数据处理
+      this.$router.push({ name: 'searchinfo', query: { searchVal: text } });
+    },
+    //热搜关键词转到搜素页
+    hotSearchWords(cid, hotword) {
+      this.sessionStorageForHistory(hotword); //搜索历史记录函数显示数据处理
+      this.$router.push({ name: 'searchinfo', query: { cid: cid } });
     },
   },
 };
@@ -219,6 +236,9 @@ export default {
       width: 100px;
       padding-left: 1px;
     }
+  }
+  .van-tag {
+    margin-top: 4px;
   }
 }
 </style>

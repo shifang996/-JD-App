@@ -44,7 +44,6 @@ export default {
   color: black;
   font-size: 20px;
   text-align: center;
-  background-color: white;
 }
 .gridnav {
   img {
@@ -52,5 +51,8 @@ export default {
     height: 38px;
     margin-bottom: 4px;
   }
+}
+.van-grid-item__content{
+  background-color: none;
 }
 </style>

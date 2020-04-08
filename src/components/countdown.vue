@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 0 14px;">
+  <div style="padding: 0 14px;margin: 6px 0;">
     <!-- 头部 -->
     <van-row type="flex" align="center" style="background-color: white;">
       <van-col :span="7"><img src="../assets/cuteDown.png"/></van-col>
@@ -21,12 +21,12 @@
     <van-swipe class="my-swipe" indicator-color="white">
       <van-swipe-item>
         <van-grid border :column-num="6" style="height: 100%;" icon-size="50px">
-          <van-grid-item v-for="item in cuteDownListA" :key="item.gid" :icon="item.image" :text="item.price"></van-grid-item>
+          <van-grid-item v-for="item in cuteDownListA" :key="item.gid" :icon="item.image" :text="item.price" @click="details(item.gid)"></van-grid-item>
         </van-grid>
       </van-swipe-item>
       <van-swipe-item
         ><van-grid border :column-num="6" style="width: 100%;" icon-size="50px">
-          <van-grid-item v-for="item in cuteDownListB" :key="item.gid" :icon="item.image" :text="item.price"></van-grid-item> </van-grid
+          <van-grid-item v-for="item in cuteDownListB" :key="item.gid" :icon="item.image" :text="item.price" @click="details(item.gid)"></van-grid-item> </van-grid
       ></van-swipe-item>
     </van-swipe>
   </div>
@@ -38,7 +38,7 @@ export default {
     this.getCuteDownData();
   },
   data() {
-    return { time: 30 * 60 * 60 * 1000, cuteDownListA: [], cuteDownListB: [], nowHours: '' };
+    return { time: 1 * 60 * 60 * 1000, cuteDownListA: [], cuteDownListB: [], nowHours: '' };
   },
   methods: {
     async getCuteDownData() {
@@ -46,8 +46,12 @@ export default {
       console.log(res.data);
       this.cuteDownListA = res.data.slice(0, 5);
       this.cuteDownListB = res.data.slice(6, 11);
-      this.nowHours = new Date().getHours();//获取当前时间
+      this.nowHours = new Date().getHours(); //获取当前时间
     },
+    //跳转详情页函数
+    details(idds){
+      this.$router.push({name:"detail",query:{gid:idds}})
+    }
   },
 };
 </script>

@@ -171,7 +171,7 @@ export default {
         handles.push({
           k: keys,
           v: valuesinfo,
-          ks: item.attrid,
+          k_s: item.attrid,
         });
       });
       console.log(handles);

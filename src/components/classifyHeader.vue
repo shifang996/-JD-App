@@ -13,22 +13,23 @@
 
 <script>
 export default {
-  components: {},
   data() {
     return {
-      searchvalue: ''
+      // vuex搜索渲染
+      searchvalue: this.$store.state.searchVal,
     };
   },
+  mounted() {},
   methods: {
     JumpWeb() {
       //返回上级菜单
-      history.go(-1)
+      history.go(-1);
     },
     //获取焦点事件触发跳转
     turnSearch() {
       this.$router.push({ name: 'search' });
-    }
-  }
+    },
+  },
 };
 </script>
 <style scoped></style>

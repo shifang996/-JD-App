@@ -1,9 +1,15 @@
 <template>
   <div style="background-color: white;">
+    <!-- 格式显示和表格显示 -->
+    <div class="showRules" @click="changeRuleShow">
+      <!-- 显示列和平行块图标 -->
+      <van-icon name="qr" color="black" size="24px" v-if="!showRules" />
+      <van-icon name="orders-o" color="black" size="24px" v-if="showRules" />
+    </div>
     <!-- 引入搜索系统classify页面 -->
     <classify-header></classify-header>
     <!-- tab切换事件change -->
-    <van-tabs v-model="active" @click="salesFunction">
+    <van-tabs v-model="active" @click="salesFunction" >
       <van-tab>
         <template #title>
           <van-dropdown-menu>
@@ -12,7 +18,7 @@
         </template>
         <template #default>
           <!-- 商品显示区域 -->
-          <van-row>
+          <van-row v-if="!showRules">
             <van-col span="24">
               <van-card v-for="item in searchValListData" :key="item.cid" :thumb="item.image" :price="item.price" :cid="item.cid" :gid="item.gid" @click="turnDetailFunction(item.gid)">
                 <template #title
@@ -22,12 +28,27 @@
               </van-card>
             </van-col>
           </van-row>
+          <van-row type="flex" justify="center" class="shoppingcon" v-if="showRules">
+            <div class="recommendshopshow" v-for="(item, index) in searchValListData" :key="index" @click="turnDetailFunction(item.gid)">
+              <dt>
+                <img :src="item.image" />
+              </dt>
+              <dd class="van-multi-ellipsis--l2" style="margin-bottom: 3px;">
+                {{ item.title }}
+              </dd>
+              <dd class="recBottom">
+                <span style="color: red;"
+                  >￥<span class="redPrice">{{ item.price }}</span> </span
+                ><span class="looklike">看相似</span>
+              </dd>
+            </div>
+          </van-row>
         </template>
       </van-tab>
       <van-tab title="销量">
         <template #default>
           <!-- 商品显示区域 -->
-          <van-row>
+          <van-row v-if="!showRules">
             <van-col span="24">
               <van-card v-for="item in searchValListData" :key="item.cid" :thumb="item.image" :price="item.price" :cid="item.cid" :gid="item.gid" @click="turnDetailFunction(item.gid)">
                 <template #title
@@ -36,6 +57,21 @@
                 <template #num> 销量:{{ item.sales }}</template>
               </van-card>
             </van-col>
+          </van-row>
+          <van-row type="flex" justify="center" class="shoppingcon" v-if="showRules">
+            <div class="recommendshopshow" v-for="(item, index) in searchValListData" :key="index" @click="turnDetailFunction(item.gid)">
+              <dt>
+                <img :src="item.image" />
+              </dt>
+              <dd class="van-multi-ellipsis--l2" style="margin-bottom: 3px;">
+                {{ item.title }}
+              </dd>
+              <dd class="recBottom">
+                <span style="color: red;"
+                  >￥<span class="redPrice">{{ item.price }}</span> </span
+                ><span class="looklike">看相似</span>
+              </dd>
+            </div>
           </van-row>
         </template>
       </van-tab>
@@ -60,7 +96,7 @@
       </van-tab>
       <van-tab title="筛选">
         <!-- 商品显示区域 -->
-        <van-row>
+        <van-row v-if="!showRules">
           <van-col span="24">
             <van-card v-for="item in searchValListData" :key="item.cid" :thumb="item.image" :price="item.price" :cid="item.cid" :gid="item.gid" @click="turnDetailFunction(item.gid)">
               <template #title
@@ -69,6 +105,21 @@
               <template #num> 销量:{{ item.sales }}</template>
             </van-card>
           </van-col>
+        </van-row>
+        <van-row type="flex" justify="center" class="shoppingcon" v-if="showRules">
+          <div class="recommendshopshow" v-for="(item, index) in searchValListData" :key="index" @click="turnDetailFunction(item.gid)">
+            <dt>
+              <img :src="item.image" />
+            </dt>
+            <dd class="van-multi-ellipsis--l2" style="margin-bottom: 3px;">
+              {{ item.title }}
+            </dd>
+            <dd class="recBottom">
+              <span style="color: red;"
+                >￥<span class="redPrice">{{ item.price }}</span> </span
+              ><span class="looklike">看相似</span>
+            </dd>
+          </div>
         </van-row>
       </van-tab>
     </van-tabs>
@@ -109,11 +160,15 @@ import classifyHeader from '../components/classifyHeader.vue';
 export default {
   components: { classifyHeader },
   created() {
-    //把上一页传来的值写入后台接口函数
-    this.searchFunction(this.$route.query.searchVal, this.renderRule, this.currentPageNum, 100, 200);
+    //把上一页传来的值写入后台接口函数**如果传来的字段为搜索字段的话就进行搜索
+    if (this.$route.query.searchVal) return this.searchFunction(this.$route.query.searchVal, this.renderRule, this.currentPageNum, 100, 200);
+    //如果传来的字段为cid的话就进行下面的操作
+    if (this.$route.query.cid) return this.hotWordsDate(this.$route.query.cid, 1, this.option1[this.value1].rule);
   },
   data() {
     return {
+      //显示格式**有列表和平行块
+      showRules: false,
       //遮罩层显示隐藏
       filterShow: false,
       active: 0,
@@ -144,6 +199,8 @@ export default {
       //最低价和最高价
       LowPricevalue: '',
       HighPricevalue: '',
+      //请求总页数旨第一次请求即可
+      reqTotal: 1,
     };
   },
   mounted() {},
@@ -154,13 +211,17 @@ export default {
       // console.log(this.option1[this.value1].rule)
       this.searchValListData = [];
       this.searchFunction(this.$route.query.searchVal, this.option1[this.value1].rule, this.currentPageNum, 100, 200);
+      // 下拉更新cid
+      if (this.$route.query.cid) return this.hotWordsDate(this.$route.query.cid, 1, this.option1[this.value1].rule);
     },
     //销量函数***监控栏目Tab 标签页****销量函数****筛选
     salesFunction() {
       console.log(this.active);
       if (this.active == 1) {
         this.searchValListData = [];
-        return this.searchFunction(this.$route.query.searchVal, 'sales', this.currentPageNum, 100, 200);
+        this.currentPageNum=1;
+        this.hotWordsDate(this.$route.query.cid, 1, 'sales');
+        this.searchFunction(this.$route.query.searchVal, 'sales', this.currentPageNum, 100, 200);
       }
       if (this.active == 3) {
         this.filterShow = true;
@@ -175,15 +236,20 @@ export default {
       const { data: res } = await this.$axios.get(`/goods/search?kwords=${text}&param=${'json'}&page=${nowPageNum}&price1=${low}&price2=${high}&otype=${rules}&cid=${''}&token=1ec949a15fb709370f`);
       console.log(res);
       //总页数
-      this.totalPageNum = res.pageinfo.pagesize;
+      if (this.reqTotal == 1) {
+        this.totalPageNum = res.pageinfo.pagesize;
+      }
       console.log(res.data);
       // 相关搜索赋值
       this.searchValListData = res.data;
+      this.reqTotal++;//第二次则不请求总页数
     },
     //点击分页器触发
     changeCurrentPageNums() {
       this.searchValListData = []; //由于第二页没有数据股因此没有办法进行渲染，只会报total为空
       this.searchFunction(this.$route.query.searchVal, this.option1[this.value1].rule, this.currentPageNum, 100, 200);
+      // cid搜索类别
+      this.hotWordsDate(this.$route.query.cid, this.currentPageNum, this.option1[this.value1].rule);
     },
     //筛选点击事件进行操作
     Mysubmit(event) {
@@ -203,13 +269,47 @@ export default {
       }
     },
     //跳转到商品详情页
-    turnDetailFunction(idds){
-      this.$router.push({name:"detail",query:{gid:idds}})
-    }
+    turnDetailFunction(idds) {
+      this.$router.push({ name: 'detail', query: { gid: idds } });
+    },
+    //改变显示样式列表形式和平行块
+    changeRuleShow() {
+      this.showRules = !this.showRules;
+    },
+    //搜索相关的cid类性值获得更多的数据
+    async hotWordsDate(cid, pageNum, rules) {
+      // console.log(cid);
+      const { data: res } = await this.$axios.get(`/goods/search?page=${pageNum}&cid=${cid}&token=1ec949a15fb709370f&otype=${rules}`);
+      console.log(res);
+      //总页数
+      if (this.reqTotal == 1) {
+        this.totalPageNum = res.pageinfo.pagesize;
+      }
+      console.log(res.data);
+      // 相关搜索赋值
+      this.searchValListData = [];
+      this.searchValListData = res.data;
+      this.reqTotal++;//第二次则不请求总页数
+    },
   },
 };
 </script>
 <style lang="less" scoped>
+.showRules {
+  position: fixed;
+  width: 34px;
+  height: 34px;
+  bottom: 100px;
+  right: 14px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid;
+  z-index: 100;
+  text-align: center;
+  .van-icon {
+    margin-top: 5px;
+  }
+}
 .van-checkbox-group {
   padding: 10px;
   .van-checkbox {
@@ -246,5 +346,44 @@ export default {
 .van-overlay {
   width: 100%;
   margin-top: 100px;
+  z-index: 1000;
+}
+/* 块状显示 */
+.shoppingcon {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.recommendshopshow {
+  border: 1px solid gainsboro;
+  padding: 4px;
+  width: 168px;
+  height: 270px;
+  margin-right: 4px;
+  background-color: white;
+  margin-bottom: 4px;
+  dt {
+    img {
+      width: 100%;
+      padding-bottom: 4px;
+    }
+  }
+  dd {
+    font-size: 13px;
+    .redPrice {
+      font-size: 16px;
+    }
+    .looklike {
+      content: '';
+      padding: 4px;
+      border: 1px solid #bfbfbf;
+      border-radius: 4px;
+      transform-origin: top left;
+    }
+  }
+  .recBottom {
+    display: flex;
+    justify-content: space-between;
+  }
 }
 </style>

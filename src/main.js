@@ -83,11 +83,13 @@ import {
   Notify,
   Image,
   Pagination,
-  Dialog,CountDown
+  Dialog,
+  CountDown,
 } from 'vant';
 //使用框架局部组件
 Vue.prototype.$dialog = Dialog;
-Vue.use(Tabbar).use(CountDown)
+Vue.use(Tabbar)
+  .use(CountDown)
   .use(TabbarItem)
   .use(Icon)
   .use(Search)
@@ -146,6 +148,9 @@ router.beforeEach((to, from, next) => {
     } else {
       next('/login'); //不存在就跳到登录页
     }
+  }
+  if (to.name == 'classify') {//搜索框头部为空进入分类的时候
+    store.commit('handle_Search', '');
   }
   next();
 });
